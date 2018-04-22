@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Scrollama Demo: Fixed CSS</title>
+	<meta name="description" content="Scrollama Demo: Fixed CSS">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="static/css/scrollama.css">>
+
+</head>
+
+<body>
+	<section id='intro'>
+		<p class='intro__overline'>
+			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
+		</p>
+		<h1 class='intro__hed'>Demo: Sticky Graphic</h1>
+		<p class='intro__dek'>
+			Start scrolling to see how it works.
+		</p>
+	</section>
+	<section id='scroll'>
+		<div class='scroll__graphic'>
+			<div class='chart'>
+				<svg width="800" height="500"></svg>
+			</div>
+		</div>
+		<div class='scroll__text'>
+			<div class='step' data-step='1'>
+				<h3>Motivation</h3>
+
+	      <p>We are often interested in proportions in Data Science.</p>
+
+	      <p>For example, we might want to know:
+	      <ul>
+	        <li>What proportion of people are left-handed?</li>
+	        <li>What proportion of voters in a district are likely to vote Republican?</li>
+	        <li>What proportion of visitors to our website are likely to make a purchase?</li>
+	      </ul></p>
+
+	      Let's ask what <b>proportion of the population is left-handed</b>, as it requires less effort to specify the population and is unlikely to change over time.
+			</div>
+
+
+			<div class='step' data-step='2a'>
+				<h3>The population</h3>
+	      On the right, we can see the distribution of left and right hands in the population.
+			</div>
+
+
+			<div class='step' data-step='3'>
+				<h3>Taking a sample</h3>
+
+	      <p>It is often infeasible and expensive to query the entire population.</p>
+
+	      <p>Instead, we estimate the proportion of left-handed people by taking a sample. In this example, we have sampled 15 people, and found <span class='first-sample-num-left'>X</span> left-handed people (<span class='first-sample-percent-left'>X</span>%).</p>
+			</div>
+
+
+			<div class='step' data-step='4'>
+				<h3>Different samples lead to different results</h3>
+
+	      <p>A different group randomly picking a sample from the same population would have a different sample.</p>
+
+	      <p>This sample of 15 people has X left-handed people (Y%), even though it is drawn from the same population.</p>
+			</div>
+
+			<div class='step' data-step='5'>
+				<h3>How accurate are our estimates?</h3>
+
+	      <p>We only have access to the sample we actually take</p>
+
+	      <p>In this population, three samples give proportions of
+					<span class='first-sample-percent-left'>X1</span>%,
+					<span class='second-sample-percent-left'>X2</span>%, and
+					<span class='third-sample-percent-left'>X3</span>% left-handed people.</p>
+			</div>
+
+		</div>
+	</section>
+	<section id='outro'></section>
+	<div class='debug'></div>
+	<script src='./d3v4+jetpack.js'></script>
+	<script src='https://unpkg.com/intersection-observer'></script>
+	<script src='https://unpkg.com/scrollama'></script>
+	<script>
+		// using d3 for convenience
+		var container = d3.select('#scroll');
+		var graphic = container.select('.scroll__graphic');
+		var chart = graphic.select('.chart');
+		var text = container.select('.scroll__text');
+		var step = text.selectAll('.step');
+
+		// initialize the scrollama
+		var scroller = scrollama();
+
+		// generic window resize listener event
+		function handleResize() {
+			// 1. update height of step elements
+			var stepHeight = Math.floor(window.innerHeight * 0.75);
+			step.style('height', stepHeight + 'px');
+
+			// 2. update width/height of graphic element
+			var bodyWidth = d3.select('body').node().offsetWidth;
+
+			graphic
+				.style('width', bodyWidth + 'px')
+				.style('height', window.innerHeight + 'px');
+
+			var chartMargin = 32;
+			var textWidth = text.node().offsetWidth;
+			var chartWidth = graphic.node().offsetWidth - textWidth - chartMargin;
+
+			chart
+				.style('width', chartWidth + 'px')
+				.style('height', Math.floor(3*window.innerHeight / 4) + 'px');
+
+
+			// 3. tell scrollama to update new element dimensions
+			scroller.resize();
+		}
+
+		// scrollama event handlers
+		function handleStepEnter(response) {
+			// response = { element, direction, index }
+
+			// add color to current step only
+			step.classed('is-active', function (d, i) {
+				return i === response.index;
+			})
+
+			// update graphic based on step
+			//chart.select('p').text(response.index + 1)
+			switch(response.index) {
+				case 0:
+					chartWhatIsP();
+					return;
+
+				case 1:
+					chartWhatIsP();
+					showAllHands();
+					highlightCells([]);
+					return;
+
+				case 2:
+				case 3:
+				case 4:
+					highlightCells(samples[response.index - 2]);
+					return;
+
+				default:
+					chart.select('p').text(response.index + 1);
+			}
+		}
+
+		function handleStepProgress(response) {
+			console.log(response);
+			//d3.select(response.element).select('p').text(d3.format('.1%')(response.progress))
+		}
+
+		function handleContainerEnter(response) {
+			// response = { direction }
+
+			// sticky the graphic (old school)
+			graphic.classed('is-fixed', true);
+			graphic.classed('is-bottom', false);
+		}
+
+		function handleContainerExit(response) {
+			// response = { direction }
+
+			// un-sticky the graphic, and pin to top/bottom of container
+			graphic.classed('is-fixed', false);
+			graphic.classed('is-bottom', response.direction === 'down');
+		}
+
+		//----------------------------
+		const handIconSize = 44;
+
+		var isLeftHand = [[false, false, false,  true, false, false, false, false, false,
+	        false],
+	       [false, false, false, false, false, false, false, false, false,
+	        false],
+	       [false, false, false, false,  true, false, false,  true, false,
+	        false],
+	       [ true, false, false, false,  true, false, false, false,  true,
+	        false],
+	       [false, false, false, false, false, false, false, false, false,
+	        false],
+	       [false, false, false, false, false, false, false, false, false,
+	        false],
+	       [false, false, false, false,  true,  true, false, false, false,
+	        false],
+	       [false,  true, false, false, false, false, false, false, false,
+	        false],
+	       [false, false, false, false, false, false, false, false, false,
+	         true],
+	       [false, false,  true, false, false, false, false, false, false,
+	        false]];
+		const samples = [
+				  [21, 95, 49, 46, 0, 26, 60, 82, 24, 91, 88, 23, 34, 5, 55],
+					[45, 38, 68, 26, 50, 42, 46, 99, 11, 98, 86, 49, 10, 52, 75],
+					[58, 66, 96, 51, 93, 32, 36, 30, 85, 94, 90, 34, 39, 95, 72]
+				];
+		//----------------------------
+		function chartWhatIsP(){
+			chart.select('svg')
+					 .selectAll('text')
+					 .data(['What fraction is left-handed?'])
+					 .enter()
+					 .append('text')
+					 .attr('x', 400)
+					 .attr('y', 50)
+					 .attr('text-anchor', 'middle')
+					 .text(d=>{console.log(d); return d;});
+		}
+
+		function showAllHands(){
+			const row_attr = {
+				width: 10*handIconSize,
+				height: handIconSize,
+				transform: (d,i) => `translate(200, ${handIconSize*i+55})`
+			};
+
+			const hand_attr = {
+				width: handIconSize,
+				height: handIconSize,
+				'xlink:href': `./static/img/right_hand.svg`,
+				transform: (d,i) => `translate(${handIconSize*(i + (d.isLeft ? 1: -1)/2) - 25}, 0) scale(${d.isLeft ? -1 : 1},1)`,
+				opacity: 0.4
+			};
+
+			const svg = chart.select('svg')
+
+			var rows = svg.selectAll('g')
+										.data(isLeftHand)
+										.enter()
+										.append('g')
+										.attrs(row_attr);
+
+			var hands = rows.selectAll('image')
+											.data((d,i)=> d.map((handtype) =>{return {isLeft: handtype, rowNum: i}}))
+											.enter()
+											.append('image')
+											.transition()
+											.duration(1000)
+											.attrs(hand_attr)
+
+
+			hands.transition().delay(500)
+					 .attrs(hand_attr)
+		}
+
+		function highlightCells(handLocations) {
+			const svg = chart.select('svg');
+
+			var circles = svg.selectAll('circle')
+											 .data(handLocations)
+
+			const circleAttrs = {
+				cx: d => (d % 10) * handIconSize + 200 - handIconSize/2,
+				cy: d =>  handIconSize* Math.floor(d / 10) - 25 + 100,
+				r: handIconSize / 2,
+				opacity: 0.3,
+				fill: 'steelblue'
+			};
+
+			circles.exit().transition().style('opacity', 0).remove();
+
+			circles.enter().append('circle').transition().duration(750).attrs(circleAttrs);
+
+			circles.transition()
+			 .duration(500)
+			 .attrs(circleAttrs);
+		}
+		//----------------------------
+
+		function init() {
+			// 1. force a resize on load to ensure proper dimensions are sent to scrollama
+			handleResize();
+
+			// 2. setup the scroller passing options
+			// this will also initialize trigger observations
+			// 3. bind scrollama event handlers (this can be chained like below)
+			scroller.setup({
+				container: '#scroll',
+				graphic: '.scroll__graphic',
+				text: '.scroll__text',
+				step: '.scroll__text .step',
+				debug: false,
+				progress: true,
+			})
+				.onStepEnter(handleStepEnter)
+				.onStepProgress(handleStepProgress)
+				.onContainerEnter(handleContainerEnter)
+				.onContainerExit(handleContainerExit);
+
+			// setup resize event
+			window.addEventListener('resize', handleResize);
+		}
+
+		// kick things off
+		init();
+
+		window.onload = function() {
+			let leftHandSamples = samples.map( singleSample =>
+				{
+					let counter = 0;
+					singleSample.forEach(elem => {
+						const handType = isLeftHand[Math.floor(elem / 10)][elem % 10]
+						console.log(`element is ${elem}, handType is ${handType}`);
+						counter += handType;
+					})
+					return counter;
+				}
+			);
+
+      [...document.getElementsByClassName('first-sample-num-left')].forEach(
+				element => element.innerHTML=`${leftHandSamples[0]}`
+			);
+
+			[...document.getElementsByClassName('second-sample-num-left')].forEach(
+				element => element.innerHTML=`${leftHandSamples[1]}`
+			);
+
+			[...document.getElementsByClassName('third-sample-num-left')].forEach(
+				element => element.innerHTML=`${leftHandSamples[2]}`
+			);
+
+			[...document.getElementsByClassName('first-sample-percent-left')].forEach(
+				element => element.innerHTML=`${Math.round(100*(leftHandSamples[0]/15)*100)/100}`
+			);
+
+			[...document.getElementsByClassName('second-sample-percent-left')].forEach(
+				element => element.innerHTML=`${Math.round(100*(leftHandSamples[1]/15)*100)/100}`
+			);
+
+			[...document.getElementsByClassName('third-sample-percent-left')].forEach(
+				element => element.innerHTML=`${Math.round(100*(leftHandSamples[2]/15)*100)/100}`
+			);
+		}
+	</script>
+</body>
+
+</html>

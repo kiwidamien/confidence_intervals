@@ -2,101 +2,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width">
-<style>
-
-body{
-  max-width: 900px;
-  margin: 0px auto;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-h1{
-  margin: 50px;
-}
-
-h1{
-  text-align: center;
-}
-
-
-#container{
-  position: relative;
-}
-
-#sections{
-  width: 340px;
-}
-
-#sections > div{
-  background: white;
-  opacity: .2;
-  margin-bottom: 200px;
-}
-#sections > div:last-child{
-  margin-bottom: 30px;
-}
-#sections > div.graph-scroll-active{
-  opacity: 1;
-}
-
-#graph{
-  margin-left: 40px;
-  width: 500px;
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0px;
-  float: right;
-}
-
-.right_hand {
-  background: #ddddff url("static/img/right_hand.svg") no-repeat right top;
-  width: 20px;
-}
-
-@media (max-width: 925px)  {
-  #graph{
-    width: 100%;
-    margin-left: 0px;
-    float: none;
-  }
-
-  #sections{
-    width: auto;
-    position: relative;
-    margin: 0px auto;
-  }
-
-  #sections > div{
-    background: rgba(255,255,255,.5);
-    padding: 10px;
-    border-top: 1px solid;
-    border-bottom: 1px solid;
-    margin-bottom: 80vh;
-  }
-
-  pre{
-    overflow: hidden;
-  }
-
-  h1{
-    margin: 10px;
-  }
-}
-
-
-circle{
-  fill: steelblue;
-}
-
-.mono{
-  font-family: monospace;
-}
-
-svg{
-  background-color: #eee;
-}
-
-</style>
+<link rel='stylesheet' type='text/css' href='static/css/graphscroll.css'/>
 
 <h1>Introduction to Confidence Intervals</h1>
 
@@ -115,9 +21,6 @@ svg{
       </ul>
 
       Let's ask what <b>proportion of the population is left-handed</b>, as it requires less effort to specify the population and is unlikely to change over time.
-      <img src='./static/img/right_hand.svg' width='50px'>
-      <span class='right_hand'>&nbsp;</span>
-      <span class='right_hand'>&nbsp;</span>
     </div>
 
     <div>
@@ -127,52 +30,29 @@ svg{
 
 
     <div>
-      <h3>Headers and footers</h3>
-      To support headers and intro images/text, the explanatory text and graphic are wrapped with a container element:
-<pre>
-&lt;h1&gt;Page Title&lt;/div&gt;
-&lt;div id='container'&gt;
-  &lt;div id='graph'&gt;&lt;/div&gt;
-  &lt;div id='sections'&gt;
-    &lt;div&gt;Section 0&lt;/div&gt;
-    &lt;div&gt;Section 1&lt;/div&gt;
-    &lt;div&gt;Section 2&lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;h1&gt;Footer&lt;/h1&gt;
-</pre>
+      <h3>Taking a sample</h3>
 
-    and passed to <span class='mono'>graphScroll</span>
+      <p>It is often infeasible and expensive to query the entire population.</p>
 
-<pre>
-d3.graphScroll()
-  .graph(d3.select('#graph'))
-  .container(d3.select('#container'))
-<pre>
+      <p>Instead, we estimate the proportion of left-handed people by taking a sample. In this example, we have sampled 15 people, and found X left-handed people (Y%).</p>
     </div>
 
     <div>
-      <h3>Sticky graph</h3>
-      When the graph starts to scroll out of view, <span class='mono'>postiion: sticky</span> keeps the graph element stuck to the top of the page while the text scrolls by.
-<pre>
-#container{
-  position: relative;
-}
+      <h3>Different samples lead to different results</h3>
 
-#sections{
-  width: 340px;
-}
+      <p>A different group randomly picking a sample from the same population would have a different sample.</p>
 
-#graph{
-  margin-left: 40px;
-  width: 500px;
-  position: sticky;
-  top: 0px;
-  float: right;
-}
-</pre>
+      <p>This sample of 15 people has X left-handed people (Y%), even though it is drawn from the same population.</p>
     </div>
 
+    <div>
+      <h3>How accurate are our estimates?</h3>
+
+      <p>We only have access to the sample we actually take</p>
+
+      <p>In this population, three samples give proportions of X1, X2, and X3 left-handed people.</p>
+
+    </div>
   </div>
 
 </div>
@@ -263,20 +143,41 @@ function render(){
 
   // return console.log(width, height)
 
-  var svg = d3.select('#graph').html('')
+  var svg = d3.select('.container-1 #graph').html('')
     .append('svg')
       .attrs({width: width, height: height})
 
-  var circle = svg.append('circle')
-      .attrs({cx: 0, cy: 0, r: r})
+  /*var circle = svg.append('circle')
+      .attrs({cx: 0, cy: 0, r: r})*/
 
-  
+  var isLeftHand = [[false, false, false,  true, false, false, false, false, false,
+        false],
+       [false, false, false, false, false, false, false, false, false,
+        false],
+       [false, false, false, false,  true, false, false,  true, false,
+        false],
+       [ true, false, false, false,  true, false, false, false,  true,
+        false],
+       [false, false, false, false, false, false, false, false, false,
+        false],
+       [false, false, false, false, false, false, false, false, false,
+        false],
+       [false, false, false, false,  true,  true, false, false, false,
+        false],
+       [false,  true, false, false, false, false, false, false, false,
+        false],
+       [false, false, false, false, false, false, false, false, false,
+         true],
+       [false, false,  true, false, false, false, false, false, false,
+        false]];
+
   var colors = ['orange', 'purple', 'steelblue', 'pink', 'black']
+  /*
   var gs = d3.graphScroll()
-      .container(d3.select('.container-1'))
-      .graph(d3.selectAll('container-1 #graph'))
-      .eventId('uniqueId1')  // namespace for scroll and resize events
-      .sections(d3.selectAll('.container-1 #sections > div'))
+      .container(d3.select('.container-old'))
+      .graph(d3.selectAll('container-old #graph'))
+      .eventId('old_uniqueId1')  // namespace for scroll and resize events
+      .sections(d3.selectAll('.container-old #sections > div'))
       // .offset(innerWidth < 900 ? innerHeight - 30 : 200)
       .on('active', function(i){
         var pos = [ {cx: width - r, cy: r},
@@ -289,6 +190,75 @@ function render(){
           .transition()
             .style('fill', colors[i])
       })
+  */
+  var handDemo = d3.graphScroll()
+      .container(d3.select('.container-1'))
+      .graph(d3.selectAll('container-1 #graph'))
+      .eventId('uniqueId1')
+      .sections(d3.selectAll('.container-1 #sections > div'))
+      .on('active', function(i){
+        var sample = [[],[21, 95, 49, 46, 0, 26, 60, 82, 24, 91, 88, 23, 34, 5, 55],
+                       [45, 38, 68, 26, 50, 42, 46, 99, 11, 98, 86, 49, 10, 52, 75],
+                       [58, 66, 96, 51, 93, 32, 36, 30, 85, 94, 90, 34, 39, 95, 72], [7, 98, 9, 57, 99, 42, 67, 19, 54, 79, 63, 28, 31, 20, 62], [49, 2, 10, 7, 75, 42, 26, 5, 62, 50, 47, 88, 39, 28, 65], [87, 55, 6, 32, 89, 51, 86, 77, 25, 65, 92, 95, 15, 97, 39], [0, 33, 69, 19, 8, 71, 73, 13, 80, 28, 24, 81, 46, 77, 11], [57, 5, 71, 9, 78, 90, 70, 45, 88, 4, 63, 23, 15, 66, 56], [42, 37, 32, 63, 86, 19, 81, 5, 4, 95, 97, 21, 17, 45, 9], [15, 83, 92, 37, 10, 61, 13, 72, 5, 68, 87, 8, 3, 79, 23]][i];
+
+        const row_attr = {
+          width: 500,
+          height: 50,
+          transform: (d,i) => `translate(50, ${50*i})`
+        };
+
+        const hand_attr = {
+          width: 50,
+          height: 50,
+          'xlink:href': `./static/img/right_hand.svg`,
+          transform: (d,i) => `translate(${50*i + (d.isLeft ? 25: -25) - 25}, 0) scale(${d.isLeft ? -1 : 1},1)`,
+          opacity: 0.4
+        };
+        /*
+        var pos = [ {cx: width - r, cy: r},
+                    {cx: r,         cy: r},
+                    {cx: width - r, cy: height - r},
+                    {cx: width/2,   cy: height/2} ][i];
+
+        circle.transition().duration(1000)
+            .attrs(pos)
+          .transition()
+            .style('fill', colors[i]);
+          */
+        var circles = svg.selectAll('circle')
+                         .data(sample);
+
+        circles.exit().remove();
+
+        circles.enter().append('circle');
+
+        circles.transition().duration(500)
+               .attr('cx', d => (d % 10) * 50 + 25)
+               .attr('cy', d => 50* Math.floor(d / 10) - 25)
+               .attr('r', 25)
+               .attr('d', d => d)
+               .attr('opacity', 0.3);
+
+        var rows = svg.selectAll('g')
+                      .data(isLeftHand)
+                      .enter()
+                      .append('g')
+                      .attrs(row_attr);
+
+        var hands = rows.selectAll('image')
+                        .data((d,i)=> d.map((handtype) =>{return {isLeft: handtype, rowNum: i}}))
+                        .enter()
+                        .append('image')
+                        .transition()
+                        .duration(1000)
+                        .attrs(hand_attr)
+
+
+        hands.transition().delay(500)
+             .attrs(hand_attr)
+
+      })
+
 
 
   var svg2 = d3.select('.container-2 #graph').html('')
