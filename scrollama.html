@@ -16,15 +16,12 @@
 		<p class='intro__overline'>
 			<a href='https://github.com/russellgoldenberg/scrollama'>scrollama.js</a>
 		</p>
-		<h1 class='intro__hed'>Demo: Sticky Graphic</h1>
-		<p class='intro__dek'>
-			Start scrolling to see how it works.
-		</p>
+		<h1 class='intro__hed'>Demo: Confidence Intervals with Scrollama</h1>
 	</section>
 	<section id='scroll'>
 		<div class='scroll__graphic'>
 			<div class='chart'>
-				<svg width="800" height="500"></svg>
+				<svg width="800" height="560"></svg>
 			</div>
 		</div>
 		<div class='scroll__text'>
@@ -64,7 +61,7 @@
 
 	      <p>A different group randomly picking a sample from the same population would have a different sample.</p>
 
-	      <p>This sample of 15 people has X left-handed people (Y%), even though it is drawn from the same population.</p>
+	      <p>This sample of 15 people has <span class='second-sample-num-left'>X</span> left-handed people (<span class='second-sample-percent-left'>X</span>%), even though it is drawn from the same population!</p>
 			</div>
 
 			<div class='step' data-step='5'>
@@ -76,8 +73,84 @@
 					<span class='first-sample-percent-left'>X1</span>%,
 					<span class='second-sample-percent-left'>X2</span>%, and
 					<span class='third-sample-percent-left'>X3</span>% left-handed people.</p>
+
+				<p> The actual percentage seems to be around the 6% - 13% mark from our samples, but we only have a small sample to work with. We would like to estimate how much error we have as a function of sample size.
+				</p>
+
 			</div>
 
+			<div class='step' data-step='6'>
+				<h3>300 samples with 100 people each</h3>
+
+				<p>If we imagine 300 groups collecting random samples of 100 people each, then most groups find around 10 in 100 people are left-handed.</p>
+
+				<p>There
+					<span id='groups-found-smallest-number-in-sample'>are X groups</span> that found
+					<span id='smallest-number-in-sample'>Y people</span> in their sample of 100, and <span id='groups-found-largest-number-in-sample'>X groups</span> that found <span id='largest-number-in-sample'>Y people</span>.</p>
+
+				<p>
+					Some groups will get the wrong answer, but most won't. Any given group will only have their answer to look at.
+				</p>
+
+			</div>
+
+			<div class='step' data-step='7'>
+				<h3>Normal distribution</h3>
+
+				<p>The sample proporitions cluster in a normal distribution around the true population proportion 10%.</p>
+
+				<p>Each group only has access to their sample proportion; they can't compare to the other surveys. With only one dot, you don't know if you have a good result or if you are one of the outliers.</p>
+
+ 				<p>Knowing the distribution of the different survey results, we can give a procedure for turning a single sample into a range of numbers. The claim is that if everyone follows this procedure, 95% of groups will have the correct proportion of left-handers in their range.
+				</p>
+
+				<p>This range is called the <i>95% confidence interval</i>.</p>
+
+			</div>
+
+			<div class='step' data-step='8'>
+				<h3>Simple Confidence Intervals</h3>
+
+				<p>Let's say we had a sample of 100 with only 3 left-handed people.</p>
+
+				<p>The simplest method assumes we got the right answer (i.e. that the 3% of the population is left-handed). We can calculate a range of the fraction of left-handed people, so that 95% of samples of left-handed people fall inside this range.</p>
+
+				<p>Assuming 3% of the population is left-handed, then 95% of samples of size 100 will have 6 or fewer left-handed people. So the confidence iterval (CI) is that between 0% and 6% of the population is left-handed.</p>
+
+				<p>This is a convinient approximate method. It tells us the range of answers 95% of surveys of the same size would get, <i>assuming our survey got the right answer</i>, and then interprets this range as the best estimate of the range for the proportion.</p>
+
+				<p>We know that only having 3 people in a sample is an outlier....</p>
+			</div>
+
+			<div class='step' data-step='9'>
+				<h3>Bayesian Confidence Intervals</h3>
+				<p>What other approaches do we have?</p>
+
+				<p>Before taking our sample, the distribution for <i>p</i> is flat &mdash; we don't know what fraction of the population is left-handed.</p>
+
+				<p>The formula for the binomial distribution can tell us if we fix <i>p</i> what the probability of finding 3 left-handed people out of 100 are. If we assume all probabilities are equally likely, then we can ask how likely it is that <i>p</i> takes a particular value, given that we have a sample of 3 people.</p>
+
+				<p>
+					The probability distribution (beta or &beta;-distribution) for <i>p</i> given a sample of 3 left-handed and 97 right-handed people is shown. We can numerically find the cutoffs so there is a 2.5% probability of <i>p</i> being lower than the low cutoff, and a probability of 2.5% of <i>p</i> being higher than the high cutoff.</p>
+
+					<p>This method tells us the person with the sample of 3 left-handers would claim a confidence interval of 1.1% to 8.4%</p>
+			</div>
+
+			<div class='step' data-step='9'>
+				<h3>Confidence intervals for samples</h3>
+				<table>
+					<tr><td>Number of lefties in sample</td><td>Confidence Interval for <i>p</i></td></tr>
+					<tr><td> 2 </td> <td> 0.60% &mdash; 6.97% </td></tr>
+					<tr><td> 4 </td> <td> 1.56% &mdash; 9.83% </td></tr>
+					<tr><td> <b>5</b> </td> <td> 2.11% &mdash; 11.18%</td></tr>
+					<tr><td> <b>10</b> </td> <td> 5.05% &mdash; 17.46% </td></tr>
+					<tr><td> <b>18</b> </td> <td> 9.90% &mdash; 26.70% </td></tr>
+					<tr><td> 19 </td> <td> 10.49% &mdash; 27.81% </td></tr>
+					<tr><td> 20 </td> <td> 11.08% &mdash; 28.91%</td></tr>
+				</table>
+
+				Following this procedure, all groups that had between 5 and 18 lefties in their group would have an interval for the proportion of left-handed people in the population that includes the correct answer, 10%.
+			</div>
 		</div>
 	</section>
 	<section id='outro'></section>
@@ -141,13 +214,42 @@
 				case 1:
 					chartWhatIsP();
 					showAllHands();
+					cleanAxis();
 					highlightCells([]);
 					return;
 
 				case 2:
 				case 3:
 				case 4:
+					chartWhatIsP();
+					showAllHands();
+					cleanAxis();
 					highlightCells(samples[response.index - 2]);
+					return;
+
+				case 5:
+					cleanHands();
+					makeHistogram();
+					return;
+
+				case 6:
+					makeHistogram();
+					progressHistogram(1.0);
+					return;
+
+				/*
+				case 7:
+					highlightSamples(5, 14);
+					return;
+				*/
+				case 7:
+					confidenceInterval();
+					return;
+
+				case 9:
+					makeHistogram();
+					progressHistogram(1.0);
+					highlightSamples(5,18);
 					return;
 
 				default:
@@ -157,6 +259,13 @@
 
 		function handleStepProgress(response) {
 			console.log(response);
+			if (response.index === 5){
+				progressHistogram(response.progress);
+			}
+
+			if (response.index === 9){
+				progressHistogram(response.progress);
+			}
 			//d3.select(response.element).select('p').text(d3.format('.1%')(response.progress))
 		}
 
@@ -204,6 +313,14 @@
 					[45, 38, 68, 26, 50, 42, 46, 99, 11, 98, 86, 49, 10, 52, 75],
 					[58, 66, 96, 51, 93, 32, 36, 30, 85, 94, 90, 34, 39, 95, 72]
 				];
+
+		const manySamples = Array(300).fill(0).map(
+			_ => {
+				const p  = 0.1;
+				const sampling = Array(100).fill(0).map(() => Math.random() <= p);
+				return sampling.reduce((x,y) => x+y);
+			}
+		)
 		//----------------------------
 		function chartWhatIsP(){
 			chart.select('svg')
@@ -214,7 +331,7 @@
 					 .attr('x', 400)
 					 .attr('y', 50)
 					 .attr('text-anchor', 'middle')
-					 .text(d=>{console.log(d); return d;});
+					 .text(d=>{return d;});
 		}
 
 		function showAllHands(){
@@ -264,7 +381,7 @@
 				cy: d =>  handIconSize* Math.floor(d / 10) - 25 + 100,
 				r: handIconSize / 2,
 				opacity: 0.3,
-				fill: 'steelblue'
+				fill: 'steelblue',
 			};
 
 			circles.exit().transition().style('opacity', 0).remove();
@@ -275,8 +392,192 @@
 			 .duration(500)
 			 .attrs(circleAttrs);
 		}
-		//----------------------------
 
+		function makeAxis() {
+			const svg = chart.select('svg');
+
+			const axis = svg.append('g');
+			axis.attr('id', 'axis').attr('transform', `translate(100,0)`);
+
+			axis.append('line')
+					.attrs({
+						x1: 0, x2: 15*24, y1: 495, y2: 495,
+						'stroke-width': 2, 'stroke': 'black',
+						opacity: 0.8
+					});
+
+			const labels = axis.selectAll('text')
+													.data([0,2,4,6,8,10,12,14,16,18,20,22,24])
+													.enter()
+													.append('text')
+													.attrs(
+														{
+															x: (d) => 15*d, y: 510, 'text-anchor': 'middle',
+															'font-size': '10pt'
+														}
+													)
+													.text(d => d);
+
+			axis.selectAll('#axisLabel')
+					.data(['Number of LH people in sample'])
+					.enter()
+					.append('text')
+					.attrs({
+						id: 'axisLabel',
+						x: 15*24 / 2,
+						y: 540,
+						'font-size': '14pt',
+						'text-anchor': 'middle'
+					})
+					.text(d=>d);
+		}
+
+		function makeLegend(svg) {
+			const legend = svg.selectAll('#legend')
+												.data([1])
+												.enter()
+												.append('g')
+												.attr('id', 'legend')
+												.attr('transform', `translate(${90 + 15*24}, 200)`);
+
+			const textAttr = {
+				x: 20,
+				y: 20,
+				'font-size': '16pt',
+				'text-anchor': 'left'
+			};
+
+			legend.append('text')
+						.attrs(textAttr)
+						.text('Each dot represents one');
+
+			legend.append('text')
+						.attrs({...textAttr, y:50})
+						.text('sample of 100 people');
+
+		}
+
+		function makeHistogram() {
+			const svg = chart.select('svg');
+
+			svg.selectAll('*').remove();
+
+			const totals = Array(100).fill(0);
+			let start = [0.1,0.2,0.25,0.28, 0.3, 0.32].concat(Array(manySamples.length - 6).fill(0).map( (d, index) => 0.32 + (0.8 - 0.32)/294 * index));
+
+			const circles = svg.selectAll('hist-data')
+												 .data(manySamples.map( (numPeople, index) => {
+													 totals[numPeople] += 1;
+													 obj =  {
+														 people: numPeople,
+														 finalPlace: 500 - 10*totals[numPeople],
+														 startTime: start[index],
+														 endTime: start[index] + 0.04
+													 }
+													 return obj;
+												 }));
+
+			circles.enter().append('circle')
+										 .attr('cx', d => 100 + 15*d.people)
+										 .attr('cy', -10)
+										 .attr('r', 4)
+										 .attr('fill', 'red')
+										 .attr('class', 'hist-data');
+
+
+			makeAxis();
+			makeLegend(svg);
+
+		}
+
+		function progressHistogram(fraction) {
+			const svg = chart.select('svg');
+
+			svg.selectAll('hist-data').transition().duration(50).attr('cy', d => {
+				console.log(d);
+				if (fraction < d.startTime){
+					return -10;
+				}
+
+				if (fraction > d.endTime) {
+					return d.finalPlace;
+				}
+
+				return -10 + (fraction- d.startTime)/(d.endTime - d.startTime)*(10 + d.finalPlace);
+			});
+
+		}
+
+		function highlightSamples(lowX, highX) {
+
+			const circles = chart.select('svg')
+													 .selectAll('.hist-data')
+													 .transition()
+													 .duration(750)
+													 .attrs({
+														 fill: d => {
+															 return ((d.people >= lowX) && (d.people < highX)) ? 'steelblue': 'red';
+														 }});
+		}
+
+		function confidenceInterval() {
+			cleanHistogramPoints();
+			const x = 300;
+			const y = 400;
+			const ticSize = 10;
+
+			const numLeft = 2;
+			const leftX = 150;
+			const rightX= 450;
+
+			const ci = chart.select('svg')
+											.append('g')
+					 						.attr('id', 'confidence_intervals');
+			const lineAttr = {
+				 'stroke': 'black',
+				 'stroke-width':1,
+				 'opacity': 0.8,
+				 'class': 'confidence'
+			 };
+
+		  ci.append('line')
+				.attrs({...lineAttr,
+					x1: leftX, x2: rightX,
+					y1: y, y2: y,
+			 });
+
+			 ci.append('line')
+			 	.attrs({...lineAttr,
+			 		x1: leftX, y1: y + ticSize,
+					x2: leftX, y2: y - ticSize
+				});
+
+			 ci.append('line')
+				.attrs({...lineAttr,
+					x1: rightX, y1: y + ticSize,
+					x2: rightX, y2: y - ticSize
+				});
+
+			 ci.append('circle')
+			 	 .attrs({
+					 cx: x, cy: y, r: 5, fill: 'red'
+				 });
+		}
+		//----------------------------
+		function cleanAxis(){
+			chart.selectAll('#axis').transition().duration(250).remove();
+			chart.selectAll('#legend').transition().duration(250).remove();
+		}
+
+		function cleanHands(){
+
+		}
+
+		function cleanHistogramPoints() {
+			chart.selectAll('.hist-data').transition().duration(250).remove();
+		}
+
+		//----------------------------
 		function init() {
 			// 1. force a resize on load to ensure proper dimensions are sent to scrollama
 			handleResize();
@@ -291,6 +592,7 @@
 				step: '.scroll__text .step',
 				debug: false,
 				progress: true,
+				offset:0.8,
 			})
 				.onStepEnter(handleStepEnter)
 				.onStepProgress(handleStepProgress)
@@ -340,6 +642,24 @@
 			[...document.getElementsByClassName('third-sample-percent-left')].forEach(
 				element => element.innerHTML=`${Math.round(100*(leftHandSamples[2]/15)*100)/100}`
 			);
+
+			const maxValue = Math.max(...manySamples)
+			const minValue = Math.min(...manySamples)
+			const numberOfMaxes = manySamples.filter( x => x === maxValue).length;
+			const numberOfMins = manySamples.filter( x => x === minValue).length;
+
+			const names = {
+				'groupMax': (numberOfMaxes > 1) ? 'groups' : 'group',
+				'groupMin': (numberOfMins > 1) ? 'groups' : 'group',
+				'verbMin': (numberOfMins > 1) ? 'are' : 'is',
+				'minLefties': (minValue > 1) ? `left-handed people` : `left-handed person`,
+				'maxLefties': (maxValue > 1) ? `left-handed people` : `left-handed person`
+			};
+
+			document.getElementById('groups-found-largest-number-in-sample').innerHTML= ` ${numberOfMaxes} ${names['groupMax']}`;
+			document.getElementById('largest-number-in-sample').innerHTML = `${maxValue} ${names['maxLefties']}`;
+			document.getElementById('groups-found-smallest-number-in-sample').innerHTML=`${names['verbMin']} ${numberOfMins} ${names['groupMin']}`;
+			document.getElementById('smallest-number-in-sample').innerHTML= `${minValue} ${names['minLefties']} `;
 		}
 	</script>
 </body>

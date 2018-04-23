@@ -141,6 +141,7 @@ a:hover {
   transition: opacity 0.8s ease;
   margin: 2rem auto;
   opacity: 0.2;
+  font-size: 1.4rem;
 }
 
 .step.is-active {
@@ -148,10 +149,7 @@ a:hover {
   background-color: lightgoldenrodyellow;
   opacity: 1.0;
 }
-/*
+
 .step p {
-  text-align: center;
   padding: 1rem;
-  font-size: 1.5rem;
 }
-*/

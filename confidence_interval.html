@@ -172,25 +172,7 @@ function render(){
         false]];
 
   var colors = ['orange', 'purple', 'steelblue', 'pink', 'black']
-  /*
-  var gs = d3.graphScroll()
-      .container(d3.select('.container-old'))
-      .graph(d3.selectAll('container-old #graph'))
-      .eventId('old_uniqueId1')  // namespace for scroll and resize events
-      .sections(d3.selectAll('.container-old #sections > div'))
-      // .offset(innerWidth < 900 ? innerHeight - 30 : 200)
-      .on('active', function(i){
-        var pos = [ {cx: width - r, cy: r},
-                    {cx: r,         cy: r},
-                    {cx: width - r, cy: height - r},
-                    {cx: width/2,   cy: height/2} ][i]
-
-        circle.transition().duration(1000)
-            .attrs(pos)
-          .transition()
-            .style('fill', colors[i])
-      })
-  */
+  
   var handDemo = d3.graphScroll()
       .container(d3.select('.container-1'))
       .graph(d3.selectAll('container-1 #graph'))
