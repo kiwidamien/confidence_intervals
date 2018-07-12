@@ -264,7 +264,8 @@
 			}
 
 			if (response.index === 9){
-				progressHistogram(response.progress);
+				progressHistogram(3.0);
+				highlightSamples(5,18);
 			}
 			//d3.select(response.element).select('p').text(d3.format('.1%')(response.progress))
 		}
@@ -465,7 +466,7 @@
 			const totals = Array(100).fill(0);
 			let start = [0.1,0.2,0.25,0.28, 0.3, 0.32].concat(Array(manySamples.length - 6).fill(0).map( (d, index) => 0.32 + (0.8 - 0.32)/294 * index));
 
-			const circles = svg.selectAll('hist-data')
+			const circles = svg.selectAll('.hist-data')
 												 .data(manySamples.map( (numPeople, index) => {
 													 totals[numPeople] += 1;
 													 obj =  {
@@ -493,8 +494,7 @@
 		function progressHistogram(fraction) {
 			const svg = chart.select('svg');
 
-			svg.selectAll('hist-data').transition().duration(50).attr('cy', d => {
-				console.log(d);
+			svg.selectAll('.hist-data').transition().duration(50).attr('cy', d => {
 				if (fraction < d.startTime){
 					return -10;
 				}
